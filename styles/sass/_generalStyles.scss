@@ -20,15 +20,16 @@ h1{
     // flex-wrap: wrap;
 }
 
+.origin{
+    position:absolute;
+    top:50%;
+    left:50%;
+}
+
 .body{
     position:absolute;
+    // border-radius: 50%;
     // top:calc(50% - 50px);
     // right:calc(50% - 50px);
     // right:0;
 }
-
-// .box1{
-//     width:100px;
-//     height:100px;
-//     background-color:red;
-// }

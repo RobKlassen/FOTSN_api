@@ -1,70 +1,94 @@
 FOTSN = {};
 
-FOTSN.createBody = function(numBodies){
-    const solarSystem = document.querySelector(".planetBox");
-    for(i = 0; i<numBodies; i++){
-        let randColorDataPoint1 = Math.ceil(Math.random()*255);
-        let randColorDataPoint2 = Math.ceil(Math.random()*255);
-        let randColorDataPoint3 = Math.ceil(Math.random()*255);
-        let randPosX = (Math.ceil(Math.random()*81) - 1);
-        let randPosY = (Math.ceil(Math.random()*81) - 1);
+FOTSN.updatePlanetPos = function(cyclenum, planet, planetWidth, tempColor, WIDTHFACTOR){
 
-        randomColor = `rgb(${randColorDataPoint1}, ${randColorDataPoint2}, ${randColorDataPoint3})`;
-        
-        
-        const planetStyle = {
-            "background-color" : String(randomColor),
-            "width" : "100px",
-            "height" : "100px",
-            // "top" : "calc(50% - 50px)",
-            "left" : String("calc(" + randPosX + "%)"),
-            // "left" : String("calc(" + randPosX + "% - 50px)"),
-            "top" : String("calc(" + randPosY + "%)"),
-            // "top" : String("calc(" + randPosY + "% - 50px)"),
+    const currentSinPos = (Math.sin(cyclenum / (180 / Math.PI)) * WIDTHFACTOR);
+    const currentCosPos = (Math.cos(cyclenum / (180 / Math.PI)) * WIDTHFACTOR);
+    // console.log(currentSinPos); 
+    // console.log(currentCosPos); 
+
+    const planetStyle = {
+        "background-color" : tempColor,
+        "width" : (planetWidth) + "px",
+        "height" : (planetWidth) + "px",
+        "border-radius" : "50%",
+        // "right" : ((currentSinPos)) + "px", 
+        "right" : (((planetWidth + currentSinPos) / 2) - planetWidth) + "px", 
+        // "bottom" : ((currentCosPos)) + "px" 
+        "bottom" : (((planetWidth + currentCosPos) / 2) - planetWidth) + "px" 
+    }
+    planet.classList.add("body");
+    Object.assign(planet.style, planetStyle);
+}
+
+FOTSN.createBody = function(tempColor, bodySize, ROTATIONSPEED, WIDTHFACTOR){
+    const solarSystem = document.querySelector(".origin");
+    const planetWidth = bodySize*100;
+    const planet = document.createElement("div");
+    solarSystem.append(planet);
+    
+    let increment = 0;  
+
+    const myTimer = function(){
+        if (increment < 10000){
+            window.requestAnimationFrame(myTimer);
+            FOTSN.updatePlanetPos(increment, planet, planetWidth, tempColor, WIDTHFACTOR);
+            increment = increment + ROTATIONSPEED;
+        } else {
+            console.log("we did it");
         }
 
-        const planet = document.createElement("div");
-        planet.classList.add("planetNum" + i, "body");
-        Object.assign(planet.style, planetStyle);
-        solarSystem.append(planet);
-    }
+    };
+    window.requestAnimationFrame(myTimer);
 }
 
 FOTSN.callAPI = async function(){
     const endpointURL = new URL('https://stevemould.com/api');
-    // let myData = FOTSN.getData(endpointURL);
     let res = await fetch(endpointURL);
     let myData = await res.json();
     return myData;
 }
 
 FOTSN.init = async function(){    
-    // let apiData = await FOTSN.callAPI()
-    // console.log(apiData);
-    // console.log(apiData.subsData);
-    // console.log(apiData.viewsData);
-    // console.log(apiData.viewsData.SteveCount);
+    // let apiData = await FOTSN.callAPI();
+
+    const steveViewCount = 100;
+    const mattViewCount = 77;
+    // const steveViewCount = apiData.viewsData.SteveCount;
+    // const mattViewCount = apiData.viewsData.MattCount;
+
+    let countRatio;
+    let steveCountAdjusted;
+    let mattCountAdjusted;
+
+
+    if (steveViewCount > mattViewCount){
+        countRatio = mattViewCount / steveViewCount;
+        steveCountAdjusted = 1;
+        mattCountAdjusted = countRatio;
+    } else {
+        countRatio = steveViewCount / mattViewCount;
+        mattCountAdjusted = 1;
+        steveCountAdjusted = countRatio;
+    }
+
+    // console.log("Steve abs", steveViewCount, ",,, matt abs", mattViewCount);
+    // console.log("steve", steveCountAdjusted,",,, matt",mattCountAdjusted);
     
-    const addBox = document.getElementById("addbox");
-    const add20Box = document.getElementById("add20box");
-    const refresh = document.getElementById("reset");
+    /*
+    FIRST NUM IS ROTATION SPEED, 1 is pretty quick already
+    SECOND NUM IS WIDTH, 150 is pretty small still
+    */
 
-    addBox.addEventListener('click', function(){
-        FOTSN.createBody(1);
-    });
-    add20Box.addEventListener('click', function(){
-        FOTSN.createBody(20);
-        // console.log("hey 20addbox");
-    });
-    refresh.addEventListener('click', function(){
-        const allplanets = document.querySelectorAll(".body");
-        allplanets.forEach(function(planet){
-            // planet.style["background-color"] = "red";
-            planet.remove();
-        });
-    });
+    // FOTSN.createBody(steveCountAdjusted, 0.5, 350);
+    // FOTSN.createBody(mattCountAdjusted, 1, 150);
 
-    FOTSN.createBody(0);
+    FOTSN.createBody("red", 0.2, 1, 100);
+    FOTSN.createBody("pink", 0.5, 0.3, 250);
+    FOTSN.createBody("yellow", 1, 0.1, 450);
+    FOTSN.createBody("white", 0.6, 0.09, 650);
+    FOTSN.createBody("green", 0.6, 0.05, 750);
+    FOTSN.createBody("blue", 0.1, 1.5, 50);
 
 }
 
